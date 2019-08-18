@@ -4,7 +4,6 @@ import Classes.Account;
 
 import java.math.BigInteger;
 import java.sql.*;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +70,7 @@ public class AccountManager implements ManagerDB{
         stmt.executeUpdate();
     }
 
-    public List<Account> select() throws SQLException, ParseException {
+    public List<Account> select() throws SQLException {
         String selectSql = "SELECT * FROM account where id = ?";
         PreparedStatement prepstmt = con.prepareStatement(selectSql);
         prepstmt.setString(1, account.getId().toString());

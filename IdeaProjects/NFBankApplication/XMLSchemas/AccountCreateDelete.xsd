@@ -1,0 +1,17 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://www.example.com/AccountCreateDelete"
+            targetNamespace="http://www.example.com/AccountCreateDelete">
+
+    <xsd:element name="accountInfo" type="accountType"/>
+
+    <xsd:complexType name="accountType">
+        <xsd:sequence>
+            <xsd:element name="unique_id" type="xsd:string"/>
+            <xsd:element name="balance" type="xsd:float"/>
+            <xsd:element name="open_date" type="xsd:date"/>
+            <xsd:element name="close_date"  type="xsd:date"/>
+            <xsd:element name="status"  type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+</xsd:schema>

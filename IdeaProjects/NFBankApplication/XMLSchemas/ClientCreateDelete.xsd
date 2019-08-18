@@ -1,0 +1,17 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://www.example.com/ClientCreateDelete" targetNamespace="http://www.example.com/ClientCreateDelete">
+
+    <xsd:element name="clientInfo" type="clientType"/>
+
+    <xsd:complexType name="clientType">
+        <xsd:sequence>
+            <xsd:element name="unique_id" type="xsd:string"/>
+            <xsd:element name="username" type="xsd:string"/>
+            <xsd:element name="password" type="xsd:string"/>
+            <xsd:element name="birth_date"  type="xsd:date"/>
+            <xsd:element name="name"  type="xsd:string"/>
+            <xsd:element name="surname"  type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+</xsd:schema>

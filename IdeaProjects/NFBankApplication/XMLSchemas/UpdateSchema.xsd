@@ -1,0 +1,21 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://www.example.com/UpdateSchema"
+            targetNamespace="http://www.example.com/UpdateSchema">
+
+    <xsd:element name="updateInfo" type="mas_update"/>
+
+    <xsd:complexType name="updateType">
+        <xsd:sequence>
+            <xsd:element name="name" type="xsd:string"/>
+            <xsd:element name="old_value" type="xsd:string"/>
+            <xsd:element name="new_value" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+    <xsd:complexType name="mas_update">
+        <xsd:sequence>
+            <xsd:element name="upd_elem" maxOccurs="unbounded"/>
+        </xsd:sequence>
+    </xsd:complexType>
+
+</xsd:schema>

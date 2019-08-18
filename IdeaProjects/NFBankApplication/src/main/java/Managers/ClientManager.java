@@ -4,7 +4,6 @@ import Classes.Client;
 
 import java.math.BigInteger;
 import java.sql.*;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +70,7 @@ public class ClientManager implements ManagerDB{
         stmt.executeUpdate();
     }
 
-    public List<Client> select() throws SQLException, ParseException {
+    public List<Client> select() throws SQLException {
         String selectSql = "SELECT * FROM client where id = ?";
         PreparedStatement stmt = con.prepareStatement(selectSql);
         stmt.setString(1, client.getId().toString());
