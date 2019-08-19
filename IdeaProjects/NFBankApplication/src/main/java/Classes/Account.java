@@ -29,7 +29,7 @@ public class Account {
         }
     }
 
-    private BigInteger id = null;
+    private long id;
     private String idAccount;
     private float balance;
     private Date open_date;
@@ -47,11 +47,11 @@ public class Account {
         setIdClient(idClient);
     }
 
-    public BigInteger getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(long id) {
         this.id = id;
     }
 

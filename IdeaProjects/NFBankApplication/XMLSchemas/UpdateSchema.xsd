@@ -14,7 +14,7 @@
 
     <xsd:complexType name="mas_update">
         <xsd:sequence>
-            <xsd:element name="upd_elem" maxOccurs="unbounded"/>
+            <xsd:element name="upd_elem" type="updateType" maxOccurs="unbounded"/>
         </xsd:sequence>
     </xsd:complexType>
 

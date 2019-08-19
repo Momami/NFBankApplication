@@ -11,7 +11,7 @@ import java.sql.Date;
 
 
 public class Client {
-    private BigInteger id = null;
+    private long id;
     private String IdClient;
     private String username;
     private String password;
@@ -30,11 +30,11 @@ public class Client {
         setLastName(lastName);
     }
 
-    public BigInteger getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(BigInteger id) {
+    public void setId(long id) {
         this.id = id;
     }
 

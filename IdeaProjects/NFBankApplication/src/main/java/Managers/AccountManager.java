@@ -37,14 +37,14 @@ public class AccountManager implements ManagerDB{
         account.setId(getIdFromDB());
     }
 
-    public BigInteger getIdFromDB() throws SQLException{
+    public long getIdFromDB() throws SQLException{
         String sql = "SELECT id FROM account WHERE unique_id = ?";
         PreparedStatement stmt = con.prepareStatement(sql);
         stmt.setString(1, account.getIdAccount());
         ResultSet acc = stmt.executeQuery();
-        BigInteger result = null;
+        long result = 0;
         while(acc.next()){
-            result = new BigInteger(acc.getString("id"));
+            result = acc.getLong("id");
         }
         return result;
     }
@@ -52,7 +52,7 @@ public class AccountManager implements ManagerDB{
     public void delete() throws SQLException{
         String deleteSql = "DELETE FROM account where id = ?";
         PreparedStatement prepStmt = con.prepareStatement(deleteSql);
-        prepStmt.setString(1, account.getId().toString());
+        prepStmt.setString(1, Long.toString(account.getId()));
         prepStmt.executeUpdate();
     }
 
@@ -66,14 +66,14 @@ public class AccountManager implements ManagerDB{
         else{
             stmt.setNull(1, Types.TIMESTAMP);
         }
-        stmt.setString(2, account.getId().toString());
+        stmt.setString(2, Long.toString(account.getId()));
         stmt.executeUpdate();
     }
 
     public List<Account> select() throws SQLException {
         String selectSql = "SELECT * FROM account where id = ?";
         PreparedStatement prepstmt = con.prepareStatement(selectSql);
-        prepstmt.setString(1, account.getId().toString());
+        prepstmt.setString(1, Long.toString(account.getId()));
         ResultSet rs = prepstmt.executeQuery();
         List<Account> result = new ArrayList<Account>();
         while (rs.next()) {

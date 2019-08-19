@@ -37,14 +37,14 @@ public class ClientManager implements ManagerDB{
         client.setId(getIdFromDB());
     }
 
-    public BigInteger getIdFromDB() throws SQLException{
+    public long getIdFromDB() throws SQLException{
         String sql = "SELECT * FROM client WHERE unique_id = ?";
         PreparedStatement stmt = con.prepareStatement(sql);
         stmt.setString(1, client.getIdClient());
         ResultSet acc = stmt.executeQuery();
-        BigInteger result = null;
+        long result = 0;
         while (acc.next()) {
-            result = new BigInteger(acc.getString("id"));
+            result = acc.getLong("id");
         }
         return result;
     }
@@ -52,7 +52,7 @@ public class ClientManager implements ManagerDB{
     public void delete() throws SQLException{
         String deleteSql = "DELETE FROM client where id = ?";
         PreparedStatement prepStmt = con.prepareStatement(deleteSql);
-        prepStmt.setString(1, client.getId().toString());
+        prepStmt.setString(1, Long.toString(client.getId()));
         prepStmt.executeUpdate();
     }
 
@@ -66,14 +66,14 @@ public class ClientManager implements ManagerDB{
         else{
             stmt.setNull(1, Types.TIMESTAMP);
         }
-        stmt.setString(2, client.getId().toString());
+        stmt.setString(2, Long.toString(client.getId()));
         stmt.executeUpdate();
     }
 
     public List<Client> select() throws SQLException {
         String selectSql = "SELECT * FROM client where id = ?";
         PreparedStatement stmt = con.prepareStatement(selectSql);
-        stmt.setString(1, client.getId().toString());
+        stmt.setString(1, Long.toString(client.getId()));
         ResultSet rs = stmt.executeQuery();
         List<Client> result = new ArrayList<Client>();
         while (rs.next()) {

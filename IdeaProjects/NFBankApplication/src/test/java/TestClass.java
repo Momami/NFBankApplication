@@ -3,6 +3,7 @@ import Classes.Client;
 import Classes.ConnectionDB;
 import Managers.AccountManager;
 import Managers.ClientManager;
+import Managers.HistoryManager;
 
 
 import java.sql.Connection;
@@ -13,7 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class TestClass {
-    public static void main(String[] args) {
+   /* public static void main(String[] args) {
         try {
             String date = "21-12-1998";
             String Url = "jdbc:sqlserver://DESKTOP-0M0S9AF;databaseName=NFBankDB;integratedSecurity=true;";
@@ -69,5 +70,21 @@ public class TestClass {
         catch (Exception e){
             System.out.println(e);
         }
+    }*/
+
+    public static void main(String[] args) {
+        try {
+            String date = "04-04-1971";
+            String Url = "jdbc:sqlserver://DESKTOP-0M0S9AF;databaseName=NFBankDB;integratedSecurity=true;";
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            Date bdate = new Date(dateFormat.parse(date).getTime());
+            Client cl = new Client("26531872653812345615", "momami", "Momami789",
+                    bdate, "Милена", "Целикина");
+            HistoryManager.createXmlClient(cl);
+        }
+        catch (Exception e){
+            System.out.println(e);
+        }
     }
+
 }

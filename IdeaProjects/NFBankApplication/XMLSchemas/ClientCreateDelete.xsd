@@ -1,5 +1,6 @@
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns="http://www.example.com/ClientCreateDelete" targetNamespace="http://www.example.com/ClientCreateDelete">
+            xmlns="http://www.example.com/ClientCreateDelete"
+            targetNamespace="http://www.example.com/ClientCreateDelete">
 
     <xsd:element name="clientInfo" type="clientType"/>
 
