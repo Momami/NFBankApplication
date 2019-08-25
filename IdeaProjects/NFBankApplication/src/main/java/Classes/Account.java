@@ -35,10 +35,10 @@ public class Account {
     private Date open_date;
     private Date close_date;
     private AccountStatus status;
-    private BigInteger idClient;
+    private long idClient;
 
     public Account(String idAccount, float balance, Date open_date, Date close_date, AccountStatus status,
-                   BigInteger idClient) throws DateException, IdNotValidException{
+                   long idClient) throws DateException, IdNotValidException{
         setIdAccount(idAccount);
         setBalance(balance);
         setOpen_date(open_date);
@@ -104,11 +104,11 @@ public class Account {
         this.status = status;
     }
 
-    public BigInteger getIdClient() {
+    public long getIdClient() {
         return idClient;
     }
 
-    public void setIdClient(BigInteger idClient) {
+    public void setIdClient(long idClient) {
         this.idClient = idClient;
     }
 }

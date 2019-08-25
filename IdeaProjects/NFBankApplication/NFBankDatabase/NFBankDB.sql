@@ -48,7 +48,7 @@ CREATE TABLE [audit](
 	object_type integer NOT NULL FOREIGN KEY REFERENCES object_type(id),
 	action_date date  NOT NULL,
 	action_id integer NOT NULL FOREIGN KEY REFERENCES audit_action(id),
-	new_value XML
+	new_value varchar(max)
 );
 GO
 
@@ -99,4 +99,8 @@ delete from client where id = 1
 
 select * from client
 select * from account
+select * from audit
+
+delete from audit
+delete from client
 */

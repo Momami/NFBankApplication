@@ -1,8 +1,9 @@
 package Managers;
 
 import Classes.Client;
+import Classes.History;
 
-import java.math.BigInteger;
+
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -35,6 +36,8 @@ public class ClientManager implements ManagerDB{
         psstmt.setString(6, client.getLastName());
         psstmt.executeUpdate();
         client.setId(getIdFromDB());
+        HistoryManager.createHistoryClient(con, client, new Date((new java.util.Date()).getTime()),
+                History.Action.CREATE);
     }
 
     public long getIdFromDB() throws SQLException{
@@ -54,9 +57,19 @@ public class ClientManager implements ManagerDB{
         PreparedStatement prepStmt = con.prepareStatement(deleteSql);
         prepStmt.setString(1, Long.toString(client.getId()));
         prepStmt.executeUpdate();
+        HistoryManager.createHistoryClient(con, client, new Date((new java.util.Date()).getTime()),
+                History.Action.DELETE);
     }
 
     public void update(String upd, String name) throws SQLException {
+        String sqlOld = "SELECT " + upd + " FROM client where id = ?";
+        PreparedStatement stmtSelect = con.prepareStatement(sqlOld);
+        stmtSelect.setString(1, Long.toString(client.getId()));
+        ResultSet old = stmtSelect.executeQuery();
+        String oldValue = null;
+        while(old.next()){
+            oldValue = old.getString(upd);
+        }
         String updSql = "UPDATE client " +
                 "SET " + upd + " = ? where id = ?";
         PreparedStatement stmt = con.prepareStatement(updSql);
@@ -68,6 +81,12 @@ public class ClientManager implements ManagerDB{
         }
         stmt.setString(2, Long.toString(client.getId()));
         stmt.executeUpdate();
+        List<String> elem = new ArrayList<String>();
+        elem.add(upd);
+        elem.add(oldValue);
+        elem.add(name);
+        HistoryManager.createHistoryUpdate(con, History.ObjectType.CLIENT, elem, client.getId(),
+                new Date((new java.util.Date()).getTime()));
     }
 
     public List<Client> select() throws SQLException {

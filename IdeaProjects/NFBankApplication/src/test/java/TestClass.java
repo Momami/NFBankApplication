@@ -1,6 +1,7 @@
 import Classes.Account;
 import Classes.Client;
 import Classes.ConnectionDB;
+import Classes.History;
 import Managers.AccountManager;
 import Managers.ClientManager;
 import Managers.HistoryManager;
@@ -11,10 +12,11 @@ import java.sql.Date;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TestClass {
-   /* public static void main(String[] args) {
+    public static void main(String[] args) {
         try {
             String date = "21-12-1998";
             String Url = "jdbc:sqlserver://DESKTOP-0M0S9AF;databaseName=NFBankDB;integratedSecurity=true;";
@@ -70,9 +72,9 @@ public class TestClass {
         catch (Exception e){
             System.out.println(e);
         }
-    }*/
+    }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         try {
             String date = "04-04-1971";
             String Url = "jdbc:sqlserver://DESKTOP-0M0S9AF;databaseName=NFBankDB;integratedSecurity=true;";
@@ -80,11 +82,18 @@ public class TestClass {
             Date bdate = new Date(dateFormat.parse(date).getTime());
             Client cl = new Client("26531872653812345615", "momami", "Momami789",
                     bdate, "Милена", "Целикина");
-            HistoryManager.createXmlClient(cl);
+            Connection con = ConnectionDB.createConn(Url);
+            HistoryManager.createHistoryClient(con, cl, bdate, History.Action.CREATE);
+            List<String> el = new ArrayList<String>(3);
+            el.add("surname");
+            el.add("Целикина");
+            el.add("Русяева");
+            HistoryManager.createHistoryUpdate(con, History.ObjectType.CLIENT,  el, 1, bdate);
+            HistoryManager.createHistoryClient(con, cl, bdate, History.Action.DELETE);
         }
         catch (Exception e){
             System.out.println(e);
         }
-    }
+    }*/
 
 }

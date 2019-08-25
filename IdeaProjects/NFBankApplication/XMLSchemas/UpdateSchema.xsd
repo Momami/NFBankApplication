@@ -2,7 +2,7 @@
             xmlns="http://www.example.com/UpdateSchema"
             targetNamespace="http://www.example.com/UpdateSchema">
 
-    <xsd:element name="updateInfo" type="mas_update"/>
+    <xsd:element name="updateInfo" type="updateType"/>
 
     <xsd:complexType name="updateType">
         <xsd:sequence>
@@ -12,10 +12,5 @@
         </xsd:sequence>
     </xsd:complexType>
 
-    <xsd:complexType name="mas_update">
-        <xsd:sequence>
-            <xsd:element name="upd_elem" type="updateType" maxOccurs="unbounded"/>
-        </xsd:sequence>
-    </xsd:complexType>
 
 </xsd:schema>

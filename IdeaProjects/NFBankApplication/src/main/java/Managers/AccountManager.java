@@ -1,6 +1,7 @@
 package Managers;
 
 import Classes.Account;
+import Classes.History;
 
 import java.math.BigInteger;
 import java.sql.*;
@@ -20,7 +21,7 @@ public class AccountManager implements ManagerDB{
     public void create() throws SQLException {
         String createSQL;
 
-            createSQL = "INSERT INTO account (unique_id, balance, open_date, close_date, status, id_client) VALUES " +
+        createSQL = "INSERT INTO account (unique_id, balance, open_date, close_date, status, id_client) VALUES " +
                     "(?, ?, ?, ?, ?, ?);";
 
         PreparedStatement psstmt = con.prepareStatement(createSQL);
@@ -32,9 +33,11 @@ public class AccountManager implements ManagerDB{
         else
             psstmt.setNull(4, Types.DATE);
         psstmt.setString(5, account.getStatus().getId());
-        psstmt.setString(6, account.getIdClient().toString());
+        psstmt.setString(6, Long.toString(account.getIdClient()));
         psstmt.executeUpdate();
         account.setId(getIdFromDB());
+        HistoryManager.createHistoryAccount(con, account, new Date((new java.util.Date()).getTime()),
+                History.Action.CREATE);
     }
 
     public long getIdFromDB() throws SQLException{
@@ -54,20 +57,41 @@ public class AccountManager implements ManagerDB{
         PreparedStatement prepStmt = con.prepareStatement(deleteSql);
         prepStmt.setString(1, Long.toString(account.getId()));
         prepStmt.executeUpdate();
+        HistoryManager.createHistoryAccount(con, account, new Date((new java.util.Date()).getTime()),
+                History.Action.DELETE);
     }
 
-    public void update(String upd, String name) throws SQLException {
+    public void update(String name, String newValue) throws SQLException {
+        String sqlOld = "SELECT " + name + " FROM account where id = ?";
+        PreparedStatement stmtSelect = con.prepareStatement(sqlOld);
+        stmtSelect.setString(1, Long.toString(account.getId()));
+        ResultSet old = stmtSelect.executeQuery();
+        String oldValue = null;
+        while(old.next()){
+            oldValue = old.getString(name);
+        }
+
         String updSql = "UPDATE account " +
-                            "SET " + upd + " = ? where id = ?";
+                            "SET " + name + " = ? where id = ?";
         PreparedStatement stmt = con.prepareStatement(updSql);
-        if (name != null){
-            stmt.setString(1, name);
+        if (newValue != null){
+            stmt.setString(1, newValue);
         }
         else{
             stmt.setNull(1, Types.TIMESTAMP);
         }
         stmt.setString(2, Long.toString(account.getId()));
+
+
+
         stmt.executeUpdate();
+
+        List<String> elements = new ArrayList<String>();
+        elements.add(name);
+        elements.add(oldValue);
+        elements.add(newValue);
+        HistoryManager.createHistoryUpdate(con, History.ObjectType.ACCOUNT, elements, account.getId(),
+                new Date((new java.util.Date()).getTime()));
     }
 
     public List<Account> select() throws SQLException {
@@ -89,7 +113,7 @@ public class AccountManager implements ManagerDB{
                         rs.getString("status"))).executeQuery();
                 Account.AccountStatus status = Account.AccountStatus.getStatus(Integer.parseInt
                         (rs.getString("status")));
-                BigInteger idClient = new BigInteger(rs.getString("id_client"));
+                long idClient = rs.getLong("id_client");
                 Account account = new Account(id, balance, open, close, status, idClient);
                 result.add(account);
             }

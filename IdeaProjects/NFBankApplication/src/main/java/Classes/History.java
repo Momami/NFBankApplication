@@ -1,7 +1,6 @@
 package Classes;
 
 import java.sql.Date;
-import commonj.sdo.DataObject;
 
 public class History {
     public enum ObjectType{
@@ -44,9 +43,9 @@ public class History {
     private ObjectType objectType;
     private Action action;
     private Date actionDate;
-    private DataObject new_value;
+    private String new_value;
 
-    public History(long object, ObjectType objectType, Action action, Date actionDate, DataObject new_value) {
+    public History(long object, ObjectType objectType, Action action, Date actionDate, String new_value) {
         this.object = object;
         this.objectType = objectType;
         this.action = action;
@@ -86,11 +85,11 @@ public class History {
         this.actionDate = actionDate;
     }
 
-    public DataObject getNew_value() {
+    public String getNew_value() {
         return new_value;
     }
 
-    public void setNew_value(DataObject new_value) {
+    public void setNew_value(String new_value) {
         this.new_value = new_value;
     }
 }

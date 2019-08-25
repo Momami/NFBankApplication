@@ -1,11 +1,11 @@
 package Managers;
 
-import java.io.FileOutputStream;
-import java.io.FileInputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.util.List;
+
 
 import Classes.Account;
 import Classes.Client;
@@ -20,7 +20,9 @@ public class HistoryManager {
     private static final String ACCOUNT_MODEL = "XMLSchemas/AccountCreateDelete.xsd";
     private static final String UPDATE_MODEL = "XMLSchemas/UpdateSchema.xsd";
     private static final String PO_NAMESPACE = "http://www.example.com/ClientCreateDelete";
-    private static final String PO_XML = "ClientCreateDelete.xml";
+    private static final String UPD_NAMESPACE = "http://www.example.com/UpdateSchema";
+    private static final String ACC_NAMESPACE = "http://www.example.com/AccountCreateDelete";
+    private static final String PO_XML = "buffer.xml";
 
     private static void defineTypes(String model) throws Exception {
         FileInputStream fis = new FileInputStream(model);
@@ -30,7 +32,7 @@ public class HistoryManager {
 
     public static void createHistoryClient(Connection con, Client cl, Date date, History.Action act){
         try {
-            DataObject clientInfo = createXmlClient(cl);
+            String clientInfo = createXmlClient(cl);
             History history = new History(cl.getId(), History.ObjectType.CLIENT, act, date, clientInfo);
             createHistory(con, history);
         }
@@ -39,23 +41,24 @@ public class HistoryManager {
 
     public static void createHistoryAccount(Connection con, Account acc, Date date, History.Action act){
         try {
-            DataObject accountInfo = createXmlAccount(acc);
+            String accountInfo = createXmlAccount(acc);
             History history = new History(acc.getId(), History.ObjectType.ACCOUNT, act, date, accountInfo);
             createHistory(con, history);
         }
         catch (Exception e){}
     }
 
-    public static void createHistoryUpdate(Connection con, long id, Date date, History.Action act){
+    public static void createHistoryUpdate(Connection con, History.ObjectType objectType, List<String> updElements,
+                                           long id, Date date){
         try {
-            DataObject upd = updateXml();
-            History history = new History(id, History.ObjectType.ACCOUNT, act, date, upd);
+            String upd = updateXml(updElements.get(0), updElements.get(1), updElements.get(2));
+            History history = new History(id, objectType, History.Action.UPDATE, date, upd);
             createHistory(con, history);
         }
         catch (Exception e){}
     }
 
-    private static DataObject createXmlClient(Client cl) throws Exception {
+    private static String createXmlClient(Client cl) throws Exception {
         defineTypes(CLIENT_MODEL);
 
         DataObject clientInfo =
@@ -70,39 +73,64 @@ public class HistoryManager {
 
         OutputStream stream = new FileOutputStream(PO_XML);
         XMLHelper.INSTANCE.save(clientInfo, PO_NAMESPACE, "clientInfo", stream);
-        return clientInfo;
+        return readFile();
     }
 
-    private static DataObject createXmlAccount(Account acc) throws Exception {
+    private static String createXmlAccount(Account acc) throws Exception {
         defineTypes(ACCOUNT_MODEL);
 
         DataObject accountInfo =
-                DataFactory.INSTANCE.create(PO_NAMESPACE, "accountType");
+                DataFactory.INSTANCE.create(ACC_NAMESPACE, "accountType");
 
         accountInfo.setString("unique_id", acc.getIdAccount());
         accountInfo.setFloat("balance", acc.getBalance());
         accountInfo.setString("open_date", acc.getOpen_date().toString());
-        accountInfo.setString("close_date", acc.getClose_date().toString());
+        if (acc.getClose_date() != null) {
+            accountInfo.setString("close_date", acc.getClose_date().toString());
+        }
+        else{
+            accountInfo.setString("close_date", "empty");
+        }
         accountInfo.setString("status", acc.getStatus().toString());
 
         OutputStream stream = new FileOutputStream(PO_XML);
         XMLHelper.INSTANCE.save(accountInfo, PO_NAMESPACE, "accountInfo", stream);
 
-        return accountInfo;
+        return readFile();
     }
 
-    private static DataObject updateXml() throws Exception{
+    private static String updateXml(String name, String oldValue, String newValue) throws Exception{
         defineTypes(UPDATE_MODEL);
 
         DataObject upd =
-                DataFactory.INSTANCE.create(PO_NAMESPACE, "mas_update");
+                DataFactory.INSTANCE.create(UPD_NAMESPACE, "updateType");
 
-
+        upd.setString("name", name);
+        if (oldValue != null) {
+            upd.setString("old_value", oldValue);
+        }
+        else{
+            upd.setString("old_value", "empty");
+        }
+        if (newValue != null) {
+            upd.setString("new_value", newValue);
+        }
+        else{
+            upd.setString("new_value", "empty");
+        }
 
         OutputStream stream = new FileOutputStream(PO_XML);
         XMLHelper.INSTANCE.save(upd, PO_NAMESPACE, "updateInfo", stream);
 
-        return upd;
+        return readFile();
+    }
+
+
+    private static String readFile() throws Exception{
+        FileInputStream inFile = new FileInputStream(PO_XML);
+        byte[] str = new byte[inFile.available()];
+        inFile.read(str);
+        return new String(str);
     }
 
     private static void createHistory(Connection con, History history) {
@@ -114,10 +142,11 @@ public class HistoryManager {
             psstmt.setString(2, history.getObjectType().getId());
             psstmt.setString(3, history.getActionDate().toString());
             psstmt.setString(4, history.getAction().getId());
-            psstmt.setString(5, history.getNew_value().toString());
+            psstmt.setString(5, history.getNew_value());
             psstmt.executeUpdate();
         }
-        catch (Exception e){}
+        catch (Exception e){
+            System.out.println(e);
+        }
     }
-
 }

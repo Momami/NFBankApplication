@@ -9,8 +9,8 @@
             <xsd:element name="unique_id" type="xsd:string"/>
             <xsd:element name="balance" type="xsd:float"/>
             <xsd:element name="open_date" type="xsd:date"/>
-            <xsd:element name="close_date"  type="xsd:date"/>
-            <xsd:element name="status"  type="xsd:string"/>
+            <xsd:element name="close_date" type="xsd:date"/>
+            <xsd:element name="status" type="xsd:string"/>
         </xsd:sequence>
     </xsd:complexType>
 
