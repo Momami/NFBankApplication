@@ -35,12 +35,11 @@ public class ClientManager implements ManagerDB{
         psstmt.setString(5, client.getFirstName());
         psstmt.setString(6, client.getLastName());
         psstmt.executeUpdate();
-        client.setId(getIdFromDB());
         HistoryManager.createHistoryClient(con, client, new Date((new java.util.Date()).getTime()),
                 History.Action.CREATE);
     }
 
-    public long getIdFromDB() throws SQLException{
+    /*public long getIdFromDB() throws SQLException{
         String sql = "SELECT * FROM client WHERE unique_id = ?";
         PreparedStatement stmt = con.prepareStatement(sql);
         stmt.setString(1, client.getIdClient());
@@ -50,28 +49,28 @@ public class ClientManager implements ManagerDB{
             result = acc.getLong("id");
         }
         return result;
-    }
+    }*/
 
     public void delete() throws SQLException{
-        String deleteSql = "DELETE FROM client where id = ?";
+        String deleteSql = "DELETE FROM client where unique_id = ?";
         PreparedStatement prepStmt = con.prepareStatement(deleteSql);
-        prepStmt.setString(1, Long.toString(client.getId()));
+        prepStmt.setString(1, client.getIdClient());
         prepStmt.executeUpdate();
         HistoryManager.createHistoryClient(con, client, new Date((new java.util.Date()).getTime()),
                 History.Action.DELETE);
     }
 
     public void update(String upd, String name) throws SQLException {
-        String sqlOld = "SELECT " + upd + " FROM client where id = ?";
+        String sqlOld = "SELECT " + upd + " FROM client where unique_id = ?";
         PreparedStatement stmtSelect = con.prepareStatement(sqlOld);
-        stmtSelect.setString(1, Long.toString(client.getId()));
+        stmtSelect.setString(1, client.getIdClient());
         ResultSet old = stmtSelect.executeQuery();
         String oldValue = null;
         while(old.next()){
             oldValue = old.getString(upd);
         }
         String updSql = "UPDATE client " +
-                "SET " + upd + " = ? where id = ?";
+                "SET " + upd + " = ? where unique_id = ?";
         PreparedStatement stmt = con.prepareStatement(updSql);
         if (name != null){
             stmt.setString(1, name);
@@ -79,20 +78,20 @@ public class ClientManager implements ManagerDB{
         else{
             stmt.setNull(1, Types.TIMESTAMP);
         }
-        stmt.setString(2, Long.toString(client.getId()));
+        stmt.setString(2, client.getIdClient());
         stmt.executeUpdate();
         List<String> elem = new ArrayList<String>();
         elem.add(upd);
         elem.add(oldValue);
         elem.add(name);
-        HistoryManager.createHistoryUpdate(con, History.ObjectType.CLIENT, elem, client.getId(),
+        HistoryManager.createHistoryUpdate(con, History.ObjectType.CLIENT, elem, client.getIdClient(),
                 new Date((new java.util.Date()).getTime()));
     }
 
     public List<Client> select() throws SQLException {
-        String selectSql = "SELECT * FROM client where id = ?";
+        String selectSql = "SELECT * FROM client where unique_id = ?";
         PreparedStatement stmt = con.prepareStatement(selectSql);
-        stmt.setString(1, Long.toString(client.getId()));
+        stmt.setString(1, client.getIdClient());
         ResultSet rs = stmt.executeQuery();
         List<Client> result = new ArrayList<Client>();
         while (rs.next()) {

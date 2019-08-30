@@ -4,17 +4,17 @@ GO
 CREATE TRIGGER Delete_Client ON client
 INSTEAD OF DELETE
 AS
-DECLARE @idClient INT
+DECLARE @idClient varchar(20)
 IF @@ROWCOUNT = 1
 BEGIN
-	SELECT @idClient = id
+	SELECT @idClient = unique_id
 	FROM deleted
 
 DELETE FROM account
 WHERE account.id_client = @idClient
 
 DELETE FROM client
-WHERE client.id = @idClient
+WHERE client.unique_id = @idClient
 
 END
 GO
@@ -28,9 +28,8 @@ BEGIN
 
 IF UPDATE(active)
 BEGIN
-	DECLARE @act_insert BIT, @idClient INT
-	DECLARE @cPlace INT, @cPatient INT
-	SELECT @act_insert = active, @idClient = id
+	DECLARE @act_insert BIT, @idClient varchar(20)
+	SELECT @act_insert = active, @idClient = unique_id
 		FROM inserted
 
 	IF @act_insert = 1

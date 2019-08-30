@@ -3,7 +3,6 @@ package Managers;
 import Classes.Account;
 import Classes.History;
 
-import java.math.BigInteger;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,14 +32,13 @@ public class AccountManager implements ManagerDB{
         else
             psstmt.setNull(4, Types.DATE);
         psstmt.setString(5, account.getStatus().getId());
-        psstmt.setString(6, Long.toString(account.getIdClient()));
+        psstmt.setString(6, account.getIdClient());
         psstmt.executeUpdate();
-        account.setId(getIdFromDB());
         HistoryManager.createHistoryAccount(con, account, new Date((new java.util.Date()).getTime()),
                 History.Action.CREATE);
     }
 
-    public long getIdFromDB() throws SQLException{
+   /* public long getIdFromDB() throws SQLException{
         String sql = "SELECT id FROM account WHERE unique_id = ?";
         PreparedStatement stmt = con.prepareStatement(sql);
         stmt.setString(1, account.getIdAccount());
@@ -50,21 +48,21 @@ public class AccountManager implements ManagerDB{
             result = acc.getLong("id");
         }
         return result;
-    }
+    }*/
 
     public void delete() throws SQLException{
-        String deleteSql = "DELETE FROM account where id = ?";
+        String deleteSql = "DELETE FROM account where unique_id = ?";
         PreparedStatement prepStmt = con.prepareStatement(deleteSql);
-        prepStmt.setString(1, Long.toString(account.getId()));
+        prepStmt.setString(1, account.getIdAccount());
         prepStmt.executeUpdate();
         HistoryManager.createHistoryAccount(con, account, new Date((new java.util.Date()).getTime()),
                 History.Action.DELETE);
     }
 
     public void update(String name, String newValue) throws SQLException {
-        String sqlOld = "SELECT " + name + " FROM account where id = ?";
+        String sqlOld = "SELECT " + name + " FROM account where unique_id = ?";
         PreparedStatement stmtSelect = con.prepareStatement(sqlOld);
-        stmtSelect.setString(1, Long.toString(account.getId()));
+        stmtSelect.setString(1, account.getIdAccount());
         ResultSet old = stmtSelect.executeQuery();
         String oldValue = null;
         while(old.next()){
@@ -72,7 +70,7 @@ public class AccountManager implements ManagerDB{
         }
 
         String updSql = "UPDATE account " +
-                            "SET " + name + " = ? where id = ?";
+                            "SET " + name + " = ? where unique_id = ?";
         PreparedStatement stmt = con.prepareStatement(updSql);
         if (newValue != null){
             stmt.setString(1, newValue);
@@ -80,7 +78,7 @@ public class AccountManager implements ManagerDB{
         else{
             stmt.setNull(1, Types.TIMESTAMP);
         }
-        stmt.setString(2, Long.toString(account.getId()));
+        stmt.setString(2, account.getIdAccount());
 
 
 
@@ -90,14 +88,14 @@ public class AccountManager implements ManagerDB{
         elements.add(name);
         elements.add(oldValue);
         elements.add(newValue);
-        HistoryManager.createHistoryUpdate(con, History.ObjectType.ACCOUNT, elements, account.getId(),
+        HistoryManager.createHistoryUpdate(con, History.ObjectType.ACCOUNT, elements, account.getIdAccount(),
                 new Date((new java.util.Date()).getTime()));
     }
 
     public List<Account> select() throws SQLException {
-        String selectSql = "SELECT * FROM account where id = ?";
+        String selectSql = "SELECT * FROM account where unique_id = ?";
         PreparedStatement prepstmt = con.prepareStatement(selectSql);
-        prepstmt.setString(1, Long.toString(account.getId()));
+        prepstmt.setString(1, account.getIdAccount());
         ResultSet rs = prepstmt.executeQuery();
         List<Account> result = new ArrayList<Account>();
         while (rs.next()) {
@@ -113,7 +111,7 @@ public class AccountManager implements ManagerDB{
                         rs.getString("status"))).executeQuery();
                 Account.AccountStatus status = Account.AccountStatus.getStatus(Integer.parseInt
                         (rs.getString("status")));
-                long idClient = rs.getLong("id_client");
+                String idClient = rs.getString("id_client");
                 Account account = new Account(id, balance, open, close, status, idClient);
                 result.add(account);
             }

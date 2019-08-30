@@ -1,9 +1,8 @@
 package Managers;
 
 import java.io.*;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -33,7 +32,7 @@ public class HistoryManager {
     public static void createHistoryClient(Connection con, Client cl, Date date, History.Action act){
         try {
             String clientInfo = createXmlClient(cl);
-            History history = new History(cl.getId(), History.ObjectType.CLIENT, act, date, clientInfo);
+            History history = new History(cl.getIdClient(), History.ObjectType.CLIENT, act, date, clientInfo);
             createHistory(con, history);
         }
         catch (Exception e){}
@@ -42,14 +41,14 @@ public class HistoryManager {
     public static void createHistoryAccount(Connection con, Account acc, Date date, History.Action act){
         try {
             String accountInfo = createXmlAccount(acc);
-            History history = new History(acc.getId(), History.ObjectType.ACCOUNT, act, date, accountInfo);
+            History history = new History(acc.getIdAccount(), History.ObjectType.ACCOUNT, act, date, accountInfo);
             createHistory(con, history);
         }
         catch (Exception e){}
     }
 
     public static void createHistoryUpdate(Connection con, History.ObjectType objectType, List<String> updElements,
-                                           long id, Date date){
+                                           String id, Date date){
         try {
             String upd = updateXml(updElements.get(0), updElements.get(1), updElements.get(2));
             History history = new History(id, objectType, History.Action.UPDATE, date, upd);
@@ -138,7 +137,7 @@ public class HistoryManager {
             String hisSql = "INSERT INTO [audit] ([object_id], object_type, action_date, action_id, new_value) " +
                     "VALUES (?, ?, ?, ?, ?);";
             PreparedStatement psstmt = con.prepareStatement(hisSql);
-            psstmt.setString(1, Long.toString(history.getObject()));
+            psstmt.setString(1, history.getObject());
             psstmt.setString(2, history.getObjectType().getId());
             psstmt.setString(3, history.getActionDate().toString());
             psstmt.setString(4, history.getAction().getId());
@@ -148,5 +147,21 @@ public class HistoryManager {
         catch (Exception e){
             System.out.println(e);
         }
+    }
+
+    public static List<History> selectHistory(String id, Connection con) throws SQLException {
+        String sql = "SELECT * FROM audit WHERE object_id = ?";
+        PreparedStatement stmt = con.prepareStatement(sql);
+        stmt.setString(1, id);
+        ResultSet stories = stmt.executeQuery();
+        List<History> result = new ArrayList<>();
+        while (stories.next()) {
+            History history = new History(stories.getString("object_id"),
+                    History.ObjectType.getStatus(stories.getInt("object_type")),
+                    History.Action.getStatus(stories.getInt("action_id")),
+                    stories.getDate("action_date"), stories.getString("new_value"));
+            result.add(history);
+        }
+        return result;
     }
 }

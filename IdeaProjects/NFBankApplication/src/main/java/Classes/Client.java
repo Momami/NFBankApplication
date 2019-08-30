@@ -6,12 +6,10 @@ import NewExceptions.NameIsNullException;
 import NewExceptions.UsernameNotValidException;
 
 import java.lang.String;
-import java.math.BigInteger;
 import java.sql.Date;
 
 
 public class Client {
-    private long id;
     private String IdClient;
     private String username;
     private String password;
@@ -30,14 +28,6 @@ public class Client {
         setLastName(lastName);
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
     public String getIdClient() {
         return IdClient;
     }
@@ -54,7 +44,7 @@ public class Client {
     }
 
     public void setUsername(String username) throws UsernameNotValidException{
-        if (username == null || username.length() > 20){
+        if (username == null || username.length() > 20 || username.length() == 0){
             throw new UsernameNotValidException("Username не должен превышать 20 символов!");
         }
         this.username = username;

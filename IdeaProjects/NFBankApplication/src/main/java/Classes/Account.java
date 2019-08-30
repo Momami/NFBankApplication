@@ -3,7 +3,6 @@ package Classes;
 import NewExceptions.DateException;
 import NewExceptions.IdNotValidException;
 
-import java.math.BigInteger;
 import java.sql.Date;
 
 
@@ -29,30 +28,21 @@ public class Account {
         }
     }
 
-    private long id;
     private String idAccount;
     private float balance;
     private Date open_date;
     private Date close_date;
     private AccountStatus status;
-    private long idClient;
+    private String idClient;
 
     public Account(String idAccount, float balance, Date open_date, Date close_date, AccountStatus status,
-                   long idClient) throws DateException, IdNotValidException{
+                   String idClient) throws DateException, IdNotValidException{
         setIdAccount(idAccount);
         setBalance(balance);
         setOpen_date(open_date);
         setClose_date(close_date);
         setStatus(status);
         setIdClient(idClient);
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public String getIdAccount() {
@@ -104,11 +94,11 @@ public class Account {
         this.status = status;
     }
 
-    public long getIdClient() {
+    public String getIdClient() {
         return idClient;
     }
 
-    public void setIdClient(long idClient) {
+    public void setIdClient(String idClient) {
         this.idClient = idClient;
     }
 }

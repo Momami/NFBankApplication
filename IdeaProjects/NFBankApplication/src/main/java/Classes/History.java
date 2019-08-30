@@ -39,13 +39,13 @@ public class History {
             return id == 1 ? CREATE : id == 2 ? UPDATE : DELETE;
         }
     }
-    private long object;
+    private String object;
     private ObjectType objectType;
     private Action action;
     private Date actionDate;
     private String new_value;
 
-    public History(long object, ObjectType objectType, Action action, Date actionDate, String new_value) {
+    public History(String object, ObjectType objectType, Action action, Date actionDate, String new_value) {
         this.object = object;
         this.objectType = objectType;
         this.action = action;
@@ -53,11 +53,11 @@ public class History {
         this.new_value = new_value;
     }
 
-    public long getObject() {
+    public String getObject() {
         return object;
     }
 
-    public void setObject(long object) {
+    public void setObject(String object) {
         this.object = object;
     }
 
