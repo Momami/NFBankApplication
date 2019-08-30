@@ -20,8 +20,7 @@ CREATE TABLE audit_action(
 GO
 
 CREATE TABLE client(
-	id bigint NOT NULL PRIMARY KEY IDENTITY(1, 1),
-	unique_id varchar(20) NOT NULL UNIQUE, 
+	unique_id varchar(20) NOT NULL PRIMARY KEY, 
 	username varchar(20) NOT NULL UNIQUE,
 	[password] varchar(30) NOT NULL,
 	birth_date date NOT NULL,
@@ -32,19 +31,18 @@ CREATE TABLE client(
 GO
 
 CREATE TABLE account(
-	id bigint NOT NULL PRIMARY KEY IDENTITY(1, 1),
-	unique_id varchar(20) NOT NULL UNIQUE, 
+	unique_id varchar(20) NOT NULL PRIMARY KEY, 
 	balance float  NOT NULL,
 	open_date date  NOT NULL,
 	close_date date,
-	id_client bigint NOT NULL FOREIGN KEY REFERENCES client(id),
+	id_client varchar(20) NOT NULL FOREIGN KEY REFERENCES client(unique_id),
 	[status] integer NOT NULL FOREIGN KEY REFERENCES account_status(id)
 );
 GO
 
 CREATE TABLE [audit](
 	id bigint NOT NULL PRIMARY KEY IDENTITY(1, 1), 
-	[object_id] bigint NOT NULL,
+	[object_id] varchar(20) NOT NULL,
 	object_type integer NOT NULL FOREIGN KEY REFERENCES object_type(id),
 	action_date date  NOT NULL,
 	action_id integer NOT NULL FOREIGN KEY REFERENCES audit_action(id),
