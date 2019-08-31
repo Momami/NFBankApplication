@@ -17,11 +17,9 @@ import org.testng.annotations.Test;
 
 import java.sql.Connection;
 import java.sql.Date;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TestClass {
@@ -42,61 +40,6 @@ public class TestClass {
         }
     }
 
-   /* public static void main(String[] args) {
-        try {
-            String date = "21-12-1998";
-
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-            Date bdate = new Date(dateFormat.parse(date).getTime());
-            Client cl = new Client("26531872653812345615", "momami", "Momami789",
-                    bdate, "Милена", "Целикина");
-
-            ClientManager clientManager = new ClientManager(con, cl);
-            //clientManager.delete();
-            clientManager.create();
-            List<Client> clients = clientManager.select();
-            for (Client elem: clients) {
-                System.out.println(String.format("%s, %s, %s, %s, %s, %s", elem.getIdClient(), elem.getFirstName(),
-                        elem.getLastName(), elem.getBirthOfDate(), elem.getUsername(), elem.getPassword()));
-            }
-            clientManager.update("surname", "Камбербэтч");
-            System.out.println(bdate.toString());
-            clients = clientManager.select();
-            for (Client elem: clients) {
-                System.out.println(String.format("%s, %s, %s, %s, %s, %s", elem.getIdClient(), elem.getFirstName(),
-                        elem.getLastName(), elem.getBirthOfDate(), elem.getUsername(), elem.getPassword()));
-            }
-
-            Date dateAcc = new Date(dateFormat.parse("10-06-2019").getTime());
-            Account acc = new Account("18739128354081514505", 2190.8f,
-                    dateAcc, null, Account.AccountStatus.OPEN, cl.getId());
-            AccountManager accManager = new AccountManager(con, acc);
-            //accManager.delete();
-            accManager.create();
-            List<Account> accounts = accManager.select();
-            for (Account elem: accounts) {
-                System.out.println(String.format("%s, %s, %s, %s", elem.getIdAccount(), elem.getBalance(),
-                        elem.getOpen_date(), elem.getStatus()));
-            }
-            accManager.update("close_date", "2019-08-12");
-            accManager.update("status", "3");
-            accounts = accManager.select();
-            for (Account elem: accounts) {
-                System.out.println(String.format("%s, %s, %s, %s, %s", elem.getIdAccount(), elem.getBalance(),
-                        elem.getOpen_date(), elem.getClose_date(), elem.getStatus()));
-            }
-        }
-        catch(SQLException e){
-            System.out.println(e);
-        }
-        catch (ParseException e){
-            System.out.println(e);
-        }
-        catch (Exception e){
-            System.out.println(e);
-        }
-    }
-*/
     @Test
     public void checkClientCreate(){
         try {
@@ -139,15 +82,15 @@ public class TestClass {
     @Test
     public void checkUpdClient(){
         try {
-            clientManager.update("surname", "Камбербэтч");
-            clientManager.update("password", "BilliMilligan");
+            clientManager.updateLastName("Камбербэтч");
+            clientManager.updatePassword("BilliMilligan");
             List<Client>clients = clientManager.select();
             for (Client elem : clients) {
                 Assert.assertEquals(elem.getLastName(), "Камбербэтч");
                 Assert.assertEquals(elem.getPassword(), "BilliMilligan");
             }
         }
-        catch (SQLException s){}
+        catch (SQLException|NameIsNullException s){}
     }
 
     @Test
@@ -188,15 +131,17 @@ public class TestClass {
     @Test
     public void checkUpdateAccount(){
         try {
-            accManager.update("close_date", "2019-08-12");
-            accManager.update("status", "3");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date close = new Date(dateFormat.parse("2019-08-12").getTime());
+            accManager.updateCloseDate(close);
+            accManager.updateStatus(Account.AccountStatus.SUSPEND);
             List<Account>accounts = accManager.select();
             for (Account elem : accounts) {
                 Assert.assertEquals(elem.getClose_date().toString(), "2019-08-12");
                 Assert.assertEquals(elem.getStatus().getId(), "3");
             }
         }
-        catch (SQLException s){}
+        catch (SQLException|ParseException s){}
     }
 
     @AfterClass
@@ -209,12 +154,19 @@ public class TestClass {
         catch (SQLException s){}
     }
 
-    @Test
-    public void checkHistory(){
+    @AfterClass
+    public void historyCheck(){
         try {
             List<History> stories = HistoryManager.selectHistory(cl.getIdClient(), con);
             for(History story : stories){
-                System.out.println(story);
+                System.out.println(String.format("%s, %s, %s, %s, %s\n", story.getObject(), story.getObjectType(),
+                        story.getAction(), story.getActionDate(), story.getNew_value()));
+            }
+            Assert.assertTrue(true);
+            stories = HistoryManager.selectHistory(acc.getIdAccount(), con);
+            for(History story : stories){
+                System.out.println(String.format("%s, %s, %s, %s, %s\n", story.getObject(), story.getObjectType(),
+                        story.getAction(), story.getActionDate(), story.getNew_value()));
             }
             Assert.assertTrue(true);
         }

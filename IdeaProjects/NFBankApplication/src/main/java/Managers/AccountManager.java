@@ -2,6 +2,8 @@ package Managers;
 
 import Classes.Account;
 import Classes.History;
+import NewExceptions.DateException;
+import NewExceptions.IdNotValidException;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -38,18 +40,6 @@ public class AccountManager implements ManagerDB{
                 History.Action.CREATE);
     }
 
-   /* public long getIdFromDB() throws SQLException{
-        String sql = "SELECT id FROM account WHERE unique_id = ?";
-        PreparedStatement stmt = con.prepareStatement(sql);
-        stmt.setString(1, account.getIdAccount());
-        ResultSet acc = stmt.executeQuery();
-        long result = 0;
-        while(acc.next()){
-            result = acc.getLong("id");
-        }
-        return result;
-    }*/
-
     public void delete() throws SQLException{
         String deleteSql = "DELETE FROM account where unique_id = ?";
         PreparedStatement prepStmt = con.prepareStatement(deleteSql);
@@ -59,38 +49,87 @@ public class AccountManager implements ManagerDB{
                 History.Action.DELETE);
     }
 
-    public void update(String name, String newValue) throws SQLException {
-        String sqlOld = "SELECT " + name + " FROM account where unique_id = ?";
+    private String prepareSelectOld(String upd) throws SQLException{
+        String sqlOld = "SELECT " + upd + " FROM account where unique_id = ?";
         PreparedStatement stmtSelect = con.prepareStatement(sqlOld);
         stmtSelect.setString(1, account.getIdAccount());
         ResultSet old = stmtSelect.executeQuery();
         String oldValue = null;
-        while(old.next()){
-            oldValue = old.getString(name);
+        while(old.next()) {
+            oldValue = old.getString(upd);
         }
+        return oldValue;
+    }
 
+    private PreparedStatement prepareUpdate(String upd)throws SQLException{
         String updSql = "UPDATE account " +
-                            "SET " + name + " = ? where unique_id = ?";
+                "SET " + upd + " = ? where unique_id = ?";
         PreparedStatement stmt = con.prepareStatement(updSql);
-        if (newValue != null){
-            stmt.setString(1, newValue);
-        }
-        else{
-            stmt.setNull(1, Types.TIMESTAMP);
-        }
         stmt.setString(2, account.getIdAccount());
+        return stmt;
+    }
 
-
-
-        stmt.executeUpdate();
-
-        List<String> elements = new ArrayList<String>();
-        elements.add(name);
-        elements.add(oldValue);
-        elements.add(newValue);
-        HistoryManager.createHistoryUpdate(con, History.ObjectType.ACCOUNT, elements, account.getIdAccount(),
+    private void createHistory(String old, String newElem, String nameField, String idAcc) throws SQLException{
+        List<String> elem = new ArrayList<String>();
+        elem.add(nameField);
+        elem.add(old);
+        elem.add(newElem);
+        HistoryManager.createHistoryUpdate(con, History.ObjectType.ACCOUNT, elem, idAcc,
                 new Date((new java.util.Date()).getTime()));
     }
+
+    public void updateUniqueId(String newId) throws SQLException, IdNotValidException {
+        String oldVal = prepareSelectOld("unique_id");
+        PreparedStatement stmt = prepareUpdate("unique_id");
+        account.setIdAccount(newId);
+        stmt.setString(1, newId);
+        stmt.executeUpdate();
+        createHistory(oldVal, newId, "unique_id", oldVal);
+    }
+
+    public void updateBalance(float newBal) throws SQLException{
+        String oldVal = prepareSelectOld("balance");
+        PreparedStatement stmt = prepareUpdate("balance");
+        account.setBalance(newBal);
+        stmt.setString(1, Float.toString(newBal));
+        stmt.executeUpdate();
+        createHistory(oldVal, Float.toString(newBal), "balance", account.getIdAccount());
+    }
+
+    public void updateOpenDate(Date open) throws SQLException, DateException {
+        String oldVal = prepareSelectOld("open_date");
+        PreparedStatement stmt = prepareUpdate("open_date");
+        account.setOpen_date(open);
+        stmt.setString(1, open.toString());
+        stmt.executeUpdate();
+        createHistory(oldVal, open.toString(), "open_date", account.getIdAccount());
+    }
+
+    public void updateCloseDate(Date close) throws SQLException{
+        String oldVal = prepareSelectOld("close_date");
+        PreparedStatement stmt = prepareUpdate("close_date");
+        account.setClose_date(close);
+        if (close != null){
+            stmt.setString(1, close.toString());
+        }
+        else{
+            stmt.setNull(1, Types.DATE);
+        }
+        stmt.executeUpdate();
+        createHistory(oldVal, close != null ? close.toString() : null, "close_date", account.getIdAccount());
+    }
+
+    public void updateStatus(Account.AccountStatus status) throws SQLException{
+        String oldVal = prepareSelectOld("status");
+        PreparedStatement stmt = prepareUpdate("status");
+        account.setStatus(status);
+        stmt.setString(1, status.getId());
+        stmt.executeUpdate();
+        createHistory(Account.AccountStatus.getStatus(Integer.parseInt(oldVal)).toString(),
+                status.toString(), "status", account.getIdAccount());
+    }
+
+
 
     public List<Account> select() throws SQLException {
         String selectSql = "SELECT * FROM account where unique_id = ?";

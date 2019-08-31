@@ -1,7 +1,7 @@
 USE [NFBankDB]
 GO
 
-CREATE TRIGGER Delete_Client ON client
+/*CREATE TRIGGER Delete_Client ON client
 INSTEAD OF DELETE
 AS
 DECLARE @idClient varchar(20)
@@ -17,7 +17,7 @@ DELETE FROM client
 WHERE client.unique_id = @idClient
 
 END
-GO
+GO*/
 
 CREATE TRIGGER Upd_client_active ON client
 FOR UPDATE

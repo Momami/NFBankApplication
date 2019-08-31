@@ -9,6 +9,7 @@ import java.sql.Date;
 
 public class Account {
 
+
     public enum AccountStatus{
         OPEN(1),
         CLOSED(2),
